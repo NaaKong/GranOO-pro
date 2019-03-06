@@ -1,0 +1,3 @@
+/home/pika7ma/KN/DomainTest/build/CMakeFiles/edit_cache.dir
+/home/pika7ma/KN/DomainTest/build/CMakeFiles/rebuild_cache.dir
+/home/pika7ma/KN/DomainTest/build/CMakeFiles/my-project.exe.dir

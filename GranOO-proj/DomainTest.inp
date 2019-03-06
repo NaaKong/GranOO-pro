@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<GranOO Version="2.0" TotIteration="23000" TimeStep="1e-3" OutDir="TEST_H" ThreadNumber="28"> 
+
+  <PreProcessing>
+
+    <PlugIn Id="_ReadDomain"  FileName="CompactDomain_16000H.lgdd"/>
+    <PlugIn Id="_SetDensity"  Density="9e9"/>
+
+    <PlugIn Id="_Convert" What="ElementPair" To="Beam" YoungModulus="134e9" RadiusRatio="0.4" /> 
+    
+    <PlugIn Id="_NewFrame" Center="(0,0.12,0)"  ID="F1"/>
+    <!-- PlugIn Id="_NewFrame" Center="(-0.27,-0.13,0)"  ID="F2"/ -->
+    <!-- PlugIn Id="_NewFrame" Center="(0.27,-0.13,0)"  ID="F3"/ -->
+    <!-- PlugIn Id="_NewFrame" Center="(0,-0.13,-0.27)"  ID="F4"/ -->
+    <!-- PlugIn Id="_NewFrame" Center="(0,-0.13,0.27)"  ID="F5"/ -->
+
+    <PlugIn Id="_NewTool" Type="Sphere" Radius="0.02" Density="3e8" Set="indentor" ID="indentor" FrameID="F1"/>
+
+    <PlugIn Id="_PutInContact" ID="indentor" Direction="(0,-1,0)" InitialStep="0.001" Precision="1e-8"/>
+    <PlugIn Id="_ComputeOptimalTimeStep" Ratio="0.1" />
+
+  </PreProcessing>
+
+  <Processing>
+    <PlugIn Id="_Check" />
+    <PlugIn Id="_ClearLoad" />
+    
+    <PlugIn Id="_ApplyBondLoad"/>
+
+    <!-- <PlugIn Id="_ManageCollision" Between="DiscreteElement/Tool" BroadPhase="Tool" ToolID="indentor" -->
+    <!-- 	    Set="Boundary-yMax" CallBack="Standard" Stiffness="1e9" /> -->
+
+    <PlugIn Id="_ManageCollision" Between="Body/Body" BroadPhase="Raw" Set1="indentor" Set2="Boundary-yMax" NarrowPhase="WithShape" CallBack="Standard" Stiffness="6e9" />
+    <PlugIn Id="_ManageCollision" Between="Body/Body" BroadPhase="Raw" Set1="wall_left" Set2="Boundary-xMin" NarrowPhase="WithShape" CallBack="Standard" Stiffness="6e9" />
+    <PlugIn Id="_ManageCollision" Between="Body/Body" BroadPhase="Raw" Set1="wall_right" Set2="Boundary-xMax" NarrowPhase="WithShape" CallBack="Standard" Stiffness="6e9" />
+    <PlugIn Id="_ManageCollision" Between="Body/Body" BroadPhase="Raw" Set1="wall_front" Set2="Boundary-zMin" NarrowPhase="WithShape" CallBack="Standard" Stiffness="6e9" />
+    <PlugIn Id="_ManageCollision" Between="Body/Body" BroadPhase="Raw" Set1="wall_back" Set2="Boundary-zMax" NarrowPhase="WithShape" CallBack="Standard" Stiffness="6e9" />
+	
+    
+    <PlugIn Id="_IntegrateAcceleration" Linear="Yes" Angular="Yes" BetaLinear="1.3" BetaAngular="1.3"/>
+    
+    <PlugIn Id="_ComputeVirialStress" FailureMode="BRITTLE" HydrostaticCriterion="6.4e6" VolumeFraction="0.9"
+	    ApplyCriterionOn="ALL" NeighbourLevel="1" IterLoop="5"   />
+
+    <PlugIn Id="_ApplyGravity" X="0." Y="-9.91" Z="0." Set="Global"/>
+
+    <PlugIn Id="_UpdateSupportShape" IterLoop="10" />
+
+    <!--PlugIn Id="_EnergyBalance"/ -->
+
+    <PlugIn Id="_ImposeDisplacement" Y="0" Set="Boundary-yMin"/>
+    <!-- PlugIn Id="_ImposeDisplacement" Z="0" Set="Global"/ -->
+    <PlugIn Id="_ImposeDisplacement" X="0" Y="-3.6e-6*it" Z="0" Set="indentor"/>
+
+    
+
+    <PlugIn Id="_DisplayInfo" Message="A bond was disabled." TriggerOnSignal="DisableBond" />
+    <PlugIn Id="_SaveDomain" IterLoop="800"/>
+    <PlugIn Id="_MonitorItemNumber" What="DEM::Beam" IterLoop="400"/>
+  </Processing>
+ 
+  <PostProcessing>
+  </PostProcessing>
+ 
+
+</GranOO>
